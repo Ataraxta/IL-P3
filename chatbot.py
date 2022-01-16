@@ -34,7 +34,7 @@ PREGUNTAS = {
     #Lengiajes de programación 3
     '¿Qué lenguajes de programación conoce?': 3, '¿Qué lenguajes de programación controla el candidato?':3,
     '¿Cuáles son los lenguajes de programación que controla el candidato?': 3, '¿Cómo se llaman los lenguajes de programación que controla el candidato?': 3,
-    '¿De qué lenguajes de programación tiene conocimientos el candidato?':3, '¿Lenguajes de programación?': 3, '¿Sabe progrmar en Python?': 3, 'Conoce Java': 3,
+    '¿De qué lenguajes de programación tiene conocimientos el candidato?':3, '¿Lenguajes de programación?': 3, '¿Sabe programar en Python?': 3, 'Conoce Java': 3,
     #Formación académica 6
     '¿Qué educación tiene el candidato?': 6, '¿Qué títulos tiene el candidato?': 6,
     '¿Cuáles son los títulos del candidato?':6, '¿Con qué titulaciones cuenta el candidato?': 6,
@@ -100,9 +100,10 @@ def limpiar_frase_titulos(cadena):
         return cadena_procesada
 
 def encontrar_titulos(df):
-    claves = ['Grado','Máster','Licenciado','Graduado','Licenciatura','PhD',
-    'Doctorado','Doctor','Titulo','Titulado','titulación','Diplomado','Diplomatura',
-    'Graduado', 'Doble Grado', 'Doble Titulación', 'Doble Graduado']
+    claves = ['Doble Grado', 'Doble Titulación', 'Doble Graduado', 'Doble Graduada',
+    'Grado','Máster','Licenciado','Licenciada','Graduado','Graduada','Licenciatura','PhD',
+    'Doctorado','Doctorada','Doctor','Doctora','Titulo','Titulado','Titulada','titulación',
+    'Diplomado','Diplomada','Diplomatura']
 
     titulos = '\n\n'
     sec_educ = encontrar_seccion(secciones[1],df)
@@ -116,7 +117,6 @@ def encontrar_titulos(df):
                 break
 
     return titulos
-
 
 def encontrar_idiomas(df):
 
@@ -293,23 +293,35 @@ def preocesar_pregunta(pregunta):
     #Buscamos la frase más cercana
     v1 = tf_idf(pregunta_procesada, IDF, union, 15)
     max = 0
+    distancias = [0,0,0,0,0,0,0,0]
+    divisores = [0,0,0,0,0,0,0,0]
     cercana = []
     for q in PREGUNTAS:
         q_procesada = limpiar_pregunta(q)
         v2 = tf_idf(q_procesada, IDF, union, 15)
         d = 1 - spatial.distance.cosine(v1, v2)
+        distancias[PREGUNTAS[q]] += d
+        divisores[PREGUNTAS[q]] += 1
         if d > max:
             max = d
-            cercana = [q, PREGUNTAS[q], d]
+            cercana = q
 
-    return cercana
+    max = 0
+    j = 0
+    for i in range(8):
+        distancias[i] = distancias[i]/divisores[i]
+        if max < distancias[i]:
+            j = i
+            max = distancias[i]
+
+    return [cercana,j,max]
 
 def preguntar_pregunta(pregunta):
         #Cotas de similitud:
         cota1 = 0.95
         cota2 = 0.6
         vector = preocesar_pregunta(pregunta)
-        print("\nEstamos seguros con score = "+str(vector[2])+" de que la pregunta es:\n"+str(vector[0])+"\n")
+        #print("\nEstamos seguros con score = "+str(vector[2])+" de que la pregunta es:\n"+str(vector[0])+"\n")
         if vector[2] >= cota1:
             selector = vector[1]
         elif vector[2] >= cota2:
@@ -413,7 +425,6 @@ def main():
         if selector == 2:
             data = open(fichero,'r')
             texto = data.read()
-            "[ (\[]{,1}[+]{,1}[ (\[]{,1}\d{0,4}[ )\]]{,1}[- ]{,3}\d{2,4}[- ]{,3}\d{2,4}[- ]{,3}\d{2,4}[- ]{,3}\d{0,4}"
             r = re.compile(r'[ (\[]{,1}[+]{,1}[ (\[]{,1}\d{0,4}[ )\]]{,1}[- ]{,3}\d{2,4}[- ]{,3}\d{2,4}[- ]{,3}\d{2,4}[- ]{,3}\d{0,4}')
             results = r.findall(texto)
             try:
@@ -445,13 +456,9 @@ def main():
 
         # Llamada para sacar la información académica del candidato
         if selector == 6:
-<<<<<<< HEAD
             print("La formación académica del candidato es:", encontrar_titulos(df))
-=======
-            print("La formación académica del candidato es: \n" + saca_texto(encontrar_seccion(secciones[1],df), df))
->>>>>>> 4377fe7dba625a18c6fca79e6ba7356244ca1b9c
 
-        # Llamada para sacar la información académica del candidato
+        # Llamada para sacar la experiencia laboral del candidato
         if selector == 7:
             print("La experiencia laboral del candidato es: \n" + saca_texto(encontrar_seccion(secciones[0],df),df))
 

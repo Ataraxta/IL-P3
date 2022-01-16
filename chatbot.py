@@ -16,25 +16,25 @@ PREGUNTAS = {
     #IDIOMAS 4
     '¿Qué idiomas habla?':4, '¿Qué idiomas conoce el candidato?': 4,
     '¿Cuáles son los idiomas que conoce el candidato?': 4, '¿Qué lenguas habla el candidato?': 4,
-    '¿Qué lenguas son las que conoce el candidato?': 4, '¿Idiomas?': 4,
+    '¿Qué lenguas son las que conoce el candidato?': 4, '¿Que idiomas habla?': 4,
     #Nombre del candidato 0
     '¿Cómo se llama el candidato?': 0, '¿Cuál es el nombre del candidato?:': 0,
     '¿Cómo se llama el candidato?': 0, '¿Con qué nombre responde el candidato?': 0,
-    '¿Quién es el candidato?': 0, '¿Nombre?': 0,
+    '¿Quién es el candidato?': 0, 'Nombre del candidato': 0,
     #Teléfono del candidato 2
     '¿Cuál es el número de teléfono del candidato?': 2, '¿Qué número de teléfono tiene el candidato?': 2,
     '¿A qué número hay que llamar para contactar con el candidato?': 2, '¿Qué número de teléfono figura como el número del candidato?': 2,
-    '¿Teléfono de contacto?': 2,
+    '¿Teléfono de contacto?': 2, '¿Cual es teléfono móvil?':2,
 
     #Experiencia laboral 7
     '¿Qué experiencia laboral tiene?': 7, '¿Qué experiencia tiene el candidato?': 7,
     '¿Cuál es la experiencia que tiene el candidato?': 7, '¿Qué tipo de experiencia tiene el candidato?':7,
     '¿Dónde ha trabajado previamente el candidato?': 7, '¿Qué profesiones ha llevado a cabo previamente el candidato?': 7,
-    '¿Experiencia?': 7,
+    '¿Experiencia?': 7, 'Donde ha trbbajado?:':7,
     #Lengiajes de programación 3
     '¿Qué lenguajes de programación conoce?': 3, '¿Qué lenguajes de programación controla el candidato?':3,
     '¿Cuáles son los lenguajes de programación que controla el candidato?': 3, '¿Cómo se llaman los lenguajes de programación que controla el candidato?': 3,
-    '¿De qué lenguajes de programación tiene conocimientos el candidato?':3, '¿Lenguajes de programación?': 3,
+    '¿De qué lenguajes de programación tiene conocimientos el candidato?':3, '¿Lenguajes de programación?': 3, '¿Sabe progrmar en Python?': 3, 'Conoce Java': 3,
     #Formación académica 6
     '¿Qué educación tiene el candidato?': 6, '¿Qué títulos tiene el candidato?': 6,
     '¿Cuáles son los títulos del candidato?':6, '¿Con qué titulaciones cuenta el candidato?': 6,
@@ -42,7 +42,7 @@ PREGUNTAS = {
     #Correo de contacto 1
     '¿Cuál es su correo de contacto?':1, '¿Cuál es el correo del candidato?': 1,
     '¿Qué correo tiene el candidato?': 1, '¿A qué dirección de correo debemos escribir para contactar con el candidato?': 1,
-    '¿Qué dirección de correo figura como la dirección del candidato?': 1, '¿Correo?': 1,
+    '¿Qué dirección de correo figura como la dirección del candidato?': 1, '¿Correo?': 1, 'email?':1,'¿email del candidato?': 1, '¿e-mail?':1,
     #Referencias 5
     '¿Cuáles son sus referencias?': 5, '¿Cuáles son las referencias del candidato?': 5,
     '¿Qué referencias tiene el candidato?': 5, '¿Qué personas pueden servir como referencia del candidato?': 5,
@@ -54,7 +54,7 @@ secciones = ['EXPERIENCIA', 'EDUCACIÓN', 'CONTACTO', 'HABILIDADES', 'IDIOMAS', 
 # Extracción de secciones:
 
 
-def encontrar_seccion(seccion):
+def encontrar_seccion(seccion, df):
     fila_i = None
     fila_f = None
     for f in range(len(df['text'])):
@@ -73,11 +73,42 @@ def saca_texto(lineas):
         texto += df['text'][j]
     return texto
 
+def encontrar_idiomas(df):
+
+    tokenizer = RegexpTokenizer(r'[0-9A-Za-z_À-ÿñ]{2,}')
+    palabras_vacias = set(stopwords.words('spanish'))
+
+    relevantes = ['Español','A1','A2','B1','B2','C1','C2','Alemán','Francés', 'Inglés', 'English'
+     'Italiano', 'Chino', 'Ruso', 'Japonés', 'Portugués', 'Catlán', 'Català', 'Vasco', 'Euskera', 'Euskara',
+     'Gallego', 'Galego']
+    limpio_relevantes = []
+    for x in relevantes:
+        limpio_relevantes.append(limpiar_pregunta(x))
+
+    idiomas = '\n'
+    for f in range(len(df['text'])):
+
+        frase = df['text'][f]
+        #print(frase)
+        frase = limpiar_pregunta(frase)
+        frase =  tokenizer.tokenize(frase)
+        #print(frase)
+        frase = [w for w in frase if not w.lower() in palabras_vacias]
+
+        if len(set(limpio_relevantes).intersection(set(frase))) > 0 :
+            idiomas += df['text'][f] + '\n'
+
+    if len(idiomas) < 3:
+        return "No hemos encontrado información de idiomas"
+
+
+    return idiomas
+
 # print(saca_texto(encontrar_seccion(secciones[0])))
 
 # Extracción del nombre del candidato:
 
-def encontrar_nombre(x):
+def encontrar_nombre(x, df):
     nlp = es_core_news_sm.load()
     doc = nlp(x)
     matcher = Matcher(nlp.vocab)
@@ -95,7 +126,7 @@ def encontrar_nombre(x):
         name, surname1, surname2 = None, None, None
     return name, surname1, surname2
 
-def devolver_nombre(x):
+def devolver_nombre(df):
     nombre = None
     for f in range(len(df['text'])):
         if df['Nombre'][f] != None and df['Apellido1'][f] != None and df['Apellido2'][f] != None:
@@ -113,7 +144,7 @@ pattern_father = [[{'POS':'PROPN', 'OP' : '+'},
 
 # Extracción de lenguajes de programación:
 
-def encontrar_lenguajes():
+def encontrar_lenguajes(df):
     lenguajes = 'Python, R, Java, C, JavaScript, Matlab, SQL, SPARQL, C++'
     punto = None
     fila = None
@@ -128,7 +159,7 @@ def encontrar_lenguajes():
 
 def tf_idf(frase, idf, union, k):
 
-    tokenizer = RegexpTokenizer(r'[A-Za-z_À-ÿ]{3,}')
+    tokenizer = RegexpTokenizer(r'[A-Za-z_À-ÿñ]{3,}')
     palabras_vacias = set(stopwords.words('spanish'))
 
     tf = dict.fromkeys(union,0)
@@ -162,19 +193,24 @@ def tf_idf(frase, idf, union, k):
 def limpiar_pregunta(cadena):
     cadena_procesada = unidecode.unidecode(cadena)  #Quitar acentos
     cadena_procesada = cadena_procesada.lower()  # A minúsculas
-    cadena_procesada = re.sub(r"[^a-z0-9 ]", "",cadena_procesada) #Quitar  carácteres especiales
+    cadena_procesada = cadena_procesada.replace('(','').replace(')','').replace('[','').replace(']','')
+    cadena_procesada = re.sub(r"[^a-z0-9 ñ]", "",cadena_procesada) #Quitar  carácteres especiales
 
     return cadena_procesada
 
 #Tomar una pregunta y buscar la más similar
 def preocesar_pregunta(pregunta):
 
-    tokenizer = RegexpTokenizer(r'[A-Za-z_À-ÿ]{3,}')
+    tokenizer = RegexpTokenizer(r'[A-Za-z_À-ÿñ]{3,}')
     palabras_vacias = set(stopwords.words('spanish'))
 
     #Preprocesar pregunta:
     pregunta_procesada = limpiar_pregunta(pregunta)
-    texto = pregunta_procesada + ' '
+    texto =  ''
+
+    #Si la pregunta esta vacía tras procesar:
+    if len(pregunta_procesada)<4:
+        return ['', '',0]
 
     #Corpus de preguntas
     for q in PREGUNTAS:
@@ -185,15 +221,21 @@ def preocesar_pregunta(pregunta):
         q_procesada = limpiar_pregunta(q) + ' '
         texto += q_procesada
 
-
+    #Miramos si la pregunta está relacionada con la base de datos de preguntas
     texto = tokenizer.tokenize(texto)
     texto = [w for w in texto if not w.lower() in palabras_vacias]
 
+    palabras_pregunta = tokenizer.tokenize(pregunta_procesada)
+    palabras_pregunta = [w for w in palabras_pregunta if not w.lower() in palabras_vacias]
+
+    if(len( set(texto).intersection(set(palabras_pregunta)) )<1):
+        return ['','',0]
+
+    for palabra in palabras_pregunta:
+        texto.append(palabra)
     #IDF
-    union = []
     N = len(texto)
-    for palabra in texto:
-        union = set(union).union([palabra])
+    union = set(texto)
 
     #print('Union  '+str(union))
 
@@ -219,42 +261,25 @@ def preocesar_pregunta(pregunta):
 
 def preguntar_pregunta(pregunta):
         #Cotas de similitud:
-        cota1 = 0.8
-        cota2 = 0.4
+        cota1 = 0.95
+        cota2 = 0.6
         vector = preocesar_pregunta(pregunta)
+        print("\nEstamos seguros con score = "+str(vector[2])+" de que la pregunta es:\n"+str(vector[0])+"\n")
         if vector[2] >= cota1:
             selector = vector[1]
         elif vector[2] >= cota2:
             selector = vector[1]
-            print("\n\n¿Es esta su pregunta: (s/n)?\n\n")
-            print("\n\n"+vector[0]+"\n\n")
+            print("\n¿Es esta su pregunta: (s/n)?\n")
+            print("\n"+vector[0]+"\n")
             confirm = input()
-            if not confirm.lower() == 's' or not confirm.lower() == 'si' or not confirm.lower() == 'sí':
+            if not confirm.lower() == 's' and not confirm.lower() == 'si' and not confirm.lower() == 'sí':
                 selector = -1
         else:
+            print("\nLo siento, no le entiendo\n")
             selector = -1
 
         return selector
-def similitud_coseno(frase1, frase2):
-    idice_a_palabra = set(model.wv.index2word)
-    v1 = vector_medio(frase1, modelo = model, n=300, index2word_set=idice_a_palabra)
-    v2 = vector_medio(frase2, modelo = model, n=300, index2word_set=idice_a_palabra)
-    d = 1 - spatial.distance.cosine(v1, v2)
 
-    return d
-
-def vector_medio(frase, modelo, n, index2word_set):
-
-    palabras = frase.split()
-    vector_c = np.zeros((n, ), dtype='float32')
-    n_palabras= 0
-    for palabra in palabras:
-        if palabra in index2word_set:
-            n_palabras += 1
-            vector_c = np.add(vector_c, model[palabra])
-    if (n_palabras > 0):
-        vector_c = np.divide(vector_c, n_palabras)
-    return vector_c
 
 def main():
     parada = False
@@ -285,13 +310,13 @@ def main():
         # Los números llegan hasta el 7, que son las dimensiones que tenemos actualmente.
         # Si queremos añadir más solo habría que aumentar el range
 
-        pregunta = input(("\n\n¿Qué quieres saber sobre el candidato? \n\n"
-        ))
+        pregunta = input(("\n\n¿Qué quieres saber sobre el candidato? \n\n"))
 
         selector = preguntar_pregunta(pregunta)
         print(selector)
 
         while selector not in range(8):
+            pregunta = input(("\n\n¿Qué quieres saber sobre el candidato? \n\n"))
             selector = preguntar_pregunta(pregunta)
             print(selector)
 
@@ -302,7 +327,10 @@ def main():
             text = [line for line in f.readlines()]
 
         df = pd.DataFrame(text,columns=['text'])
+
         df.head()
+
+        #print("\n df = \n"+str(df))
 
         text = df['text'][0]
         nlp = es_core_news_sm.load()
@@ -319,7 +347,7 @@ def main():
         if selector == 0:
             new_columns = ['Nombre','Apellido1', 'Apellido2']
             for n,col in enumerate(new_columns):
-                df[col] = df['text'].apply(lambda x: encontrar_nombre(x)).apply(lambda x: x[n])
+                df[col] = df['text'].apply(lambda x: encontrar_nombre(x, df)).apply(lambda x: x[n])
             print("El nombre completo del candidato es:", devolver_nombre(df))
 
         # Llamada para sacar el correo del candidato
@@ -329,38 +357,53 @@ def main():
 
             r = re.compile(r'(\b[\w.]+@+[\w.]+.+[\w.]\b)')
             results = r.findall(texto)
-            email_del_candidato = results[0]
-            print("El email del candidato es:", email_del_candidato)
+            try:
+                email_del_candidato = results[0]
+                print("El email del candidato es:", email_del_candidato)
+            except Exception as e:
+                print('No hemos encontrado email')
 
         # Llamada para sacar el número de teléfono del candidato
         # Te dejo la estructura del email porque podría sacarse de forma similar
         if selector == 2:
             data = open(fichero,'r')
             texto = data.read()
-
-            r = re.compile(r'(\b[\w.]+@+[\w.]+.+[\w.]\b)')
+            "[ (\[]{,1}[+]{,1}[ (\[]{,1}\d{0,4}[ )\]]{,1}[- ]{,3}\d{2,4}[- ]{,3}\d{2,4}[- ]{,3}\d{2,4}[- ]{,3}\d{0,4}"
+            r = re.compile(r'[ (\[]{,1}[+]{,1}[ (\[]{,1}\d{0,4}[ )\]]{,1}[- ]{,3}\d{2,4}[- ]{,3}\d{2,4}[- ]{,3}\d{2,4}[- ]{,3}\d{0,4}')
             results = r.findall(texto)
-            email_del_candidato = results[0]
-            print("El teléfono del candidato es: ESTÁ POR HACER")
+            try:
+                telefono_del_candidato = results[0]
+                i = 0
+                while(len(telefono_del_candidato.replace(" ", "").replace("-", "")) < 9):
+                    i += 1
+                    telefono_del_candidato = results[i]
+
+                print("El teléfono del candidato es:", telefono_del_candidato)
+
+            except Exception as e:
+                print('No hemos encontrado teléfono de contacto')
+
+
+
 
         # Llamada a sacar los lenguajes de programación que conoce el candidato
         if selector == 3:
-            print('Los lenguajes de programación que maneja el candidato son:', encontrar_lenguajes() + '.')
+            print('Los lenguajes de programación que maneja el candidato son:', encontrar_lenguajes(df) + '.')
 
         # Llamada para sacar los idiomas que sabe el candidato
         if selector == 4:
-            print("Los idiomas que maneja el candidato son:", encontrar_seccion(secciones[4]))
+            print("Los idiomas que maneja el candidato son:", encontrar_idiomas(df))
 
         # Llamada para sacar las referencias del candidato
         if selector == 5:
-            print("Las referencias del candidato son:", encontrar_seccion(secciones[5]))
+            print("Las referencias del candidato son:", encontrar_seccion(secciones[5],df))
 
         # Llamada para sacar la información académica del candidato
         if selector == 6:
-            print("La formación académica del candidato es:", encontrar_seccion(secciones[1]))
+            print("La formación académica del candidato es:", encontrar_seccion(secciones[1],df))
 
         # Llamada para sacar la información académica del candidato
         if selector == 7:
-            print("La experiencia laboral del candidato es:", encontrar_seccion(secciones[0]))
+            print("La experiencia laboral del candidato es:", encontrar_seccion(secciones[0],df))
 
 main()

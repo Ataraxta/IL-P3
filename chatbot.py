@@ -445,11 +445,7 @@ def main():
 
         # Llamada para sacar la información académica del candidato
         if selector == 6:
-<<<<<<< HEAD
-            print("La formación académica del candidato es:", encontrar_titulos(df))
-=======
-            print("La formación académica del candidato es: \n" + saca_texto(encontrar_seccion(secciones[1],df), df))
->>>>>>> 4377fe7dba625a18c6fca79e6ba7356244ca1b9c
+            print("La formación académica del candidato es:" + saca_texto(encontrar_titulos(df), df))
 
         # Llamada para sacar la información académica del candidato
         if selector == 7:

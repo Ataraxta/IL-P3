@@ -30,7 +30,7 @@ PREGUNTAS = {
     '¿Qué experiencia laboral tiene?': 7, '¿Qué experiencia tiene el candidato?': 7,
     '¿Cuál es la experiencia que tiene el candidato?': 7, '¿Qué tipo de experiencia tiene el candidato?':7,
     '¿Dónde ha trabajado previamente el candidato?': 7, '¿Qué profesiones ha llevado a cabo previamente el candidato?': 7,
-    '¿Experiencia?': 7, 'Donde ha trbbajado?:':7,
+    '¿Qué experiencia experiencia tiene?': 7, 'Donde ha trabajado?:':7,
     #Lengiajes de programación 3
     '¿Qué lenguajes de programación conoce?': 3, '¿Qué lenguajes de programación controla el candidato?':3,
     '¿Cuáles son los lenguajes de programación que controla el candidato?': 3, '¿Cómo se llaman los lenguajes de programación que controla el candidato?': 3,

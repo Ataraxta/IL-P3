@@ -53,7 +53,6 @@ secciones = ['EXPERIENCIA', 'EDUCACIÓN', 'CONTACTO', 'HABILIDADES', 'IDIOMAS', 
 
 # Extracción de secciones:
 
-
 def encontrar_seccion(seccion, df):
     fila_i = None
     fila_f = None
@@ -72,6 +71,49 @@ def saca_texto(lineas):
     for j in range(i, f):
         texto += df['text'][j]
     return texto
+
+def sub_frase_a_partir_de_palabra(frase, palabra):
+    separadores = ['.',':','|',';',',','/']
+    try:
+        i = frase.index(palabra)
+        sol = frase[i:]
+        min = len(sol)
+        for s in separadores:
+            try:
+                j = sol.index(s)
+                #print(sol[0:j]+'\n')
+                if j < min:
+                    min = j
+            except Exception as e:
+                pass
+
+        return (i,i+min)
+    except Exception as e:
+        return (0,0)
+
+def limpiar_frase_titulos(cadena):
+        cadena_procesada = unidecode.unidecode(cadena)  #Quitar acentos
+        cadena_procesada = cadena_procesada.lower()  # A minúsculas
+        return cadena_procesada
+
+def encontrar_titulos(df):
+    claves = ['Grado','Máster','Licenciado','Graduado','Licenciatura','PhD',
+    'Doctorado','Doctor','Titulo','Titulado','titulación','Diplomado','Diplomatura',
+    'Graduado', 'Doble Grado', 'Doble Titulación', 'Doble Graduado']
+
+    titulos = '\n\n'
+    sec_educ = encontrar_seccion(secciones[1],df)
+    for f in range(sec_educ[0],(sec_educ[1]+1)):
+        frase = df['text'][f]
+        frase = limpiar_frase_titulos(frase)
+        for clave in claves:
+            indices = sub_frase_a_partir_de_palabra(frase,limpiar_frase_titulos(clave))
+            if (indices[1]-indices[0] > 2) and (limpiar_frase_titulos(df['text'][f][indices[0]:indices[1]]) not in  limpiar_frase_titulos(clave)):
+                titulos +=  df['text'][f][indices[0]:indices[1]]+'\n'
+                break
+
+    return titulos
+
 
 def encontrar_idiomas(df):
 
@@ -400,7 +442,7 @@ def main():
 
         # Llamada para sacar la información académica del candidato
         if selector == 6:
-            print("La formación académica del candidato es:", encontrar_seccion(secciones[1],df))
+            print("La formación académica del candidato es:", encontrar_titulos(df))
 
         # Llamada para sacar la información académica del candidato
         if selector == 7:

@@ -19,7 +19,7 @@ Empecé en 09-2020 y con vistas a terminar en 07/2022
 Machine Learning, Redes Neuronales, Ingeniería Lingüística, Redes Bayesianas, Ingeniería
 Ontológica.
 
-Universidad de Valladolid, Doble Grado degree, Grado en Matemáticas e Ingeniería Informática.
+Universidad de Valladolid, Doble Grado en Matemáticas e Ingeniería Informática.
 De 09-2015 a 02-2021
 Matemáticas: Álgebra Lineal, Ecuaciones Diferenciales, Estadística, Topología, Teoría de la Probabilidad, Cálculo, Geometría Computacional. Trabajo de Fin de Grado: Geometría Algebraica y Códigos correctores de errores y Semigrupos Numéricos.
 Informática: Programación Orientada a Objetos, Proceso de desarrollo Software, Estructuras de datos y algoritmos, utilización de bases de datos, utilización de sistemas operativos, criptografía, Problemas de programación de horarios. Trabajo de Fin de Grado: Numerical Semigroups and Feng Rao distances with GAP.

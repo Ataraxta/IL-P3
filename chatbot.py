@@ -64,12 +64,15 @@ def encontrar_seccion(seccion, df):
         if fila_i != None and all(v) and f!= fila_i and len(v) != 0:
             fila_f = f
             break
+        if f == len(df['text']) -1:
+            fila_f = f + 1
+            break
     return (fila_i, fila_f)
 
-def saca_texto(lineas):
+def saca_texto(lineas, df):
     i, f = lineas
     texto = ''
-    for j in range(i, f):
+    for j in range(i+1, f):
         texto += df['text'][j]
     return texto
 
@@ -388,22 +391,22 @@ def main():
 
         # Llamada a sacar los lenguajes de programación que conoce el candidato
         if selector == 3:
-            print('Los lenguajes de programación que maneja el candidato son:', encontrar_lenguajes(df) + '.')
+            print('Los lenguajes de programación que maneja el candidato son: \n' + encontrar_lenguajes(df) + '.')
 
         # Llamada para sacar los idiomas que sabe el candidato
         if selector == 4:
-            print("Los idiomas que maneja el candidato son:", encontrar_idiomas(df))
+            print("Los idiomas que maneja el candidato son: \n" + encontrar_idiomas(df))
 
         # Llamada para sacar las referencias del candidato
         if selector == 5:
-            print("Las referencias del candidato son:", encontrar_seccion(secciones[5],df))
+            print("Las referencias del candidato son: \n" + saca_texto(encontrar_seccion(secciones[5],df), df))
 
         # Llamada para sacar la información académica del candidato
         if selector == 6:
-            print("La formación académica del candidato es:", encontrar_seccion(secciones[1],df))
+            print("La formación académica del candidato es: \n" + saca_texto(encontrar_seccion(secciones[1],df), df))
 
         # Llamada para sacar la información académica del candidato
         if selector == 7:
-            print("La experiencia laboral del candidato es:", encontrar_seccion(secciones[0],df))
+            print("La experiencia laboral del candidato es: \n" + saca_texto(encontrar_seccion(secciones[0],df),df))
 
 main()
